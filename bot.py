@@ -16,6 +16,7 @@ CONFIG_FILE = "server_config.json"
 
 
 # FILE UTILS
+
 def load_sent_news():
     if os.path.exists(SENT_NEWS_FILE):
         with open(SENT_NEWS_FILE, "r") as f:
@@ -44,7 +45,8 @@ def save_configs(configs):
         json.dump(configs, f, indent=4)
 
 
-# WINUX-CHAN
+# Winux-chan
+
 class NewsBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -65,6 +67,7 @@ class NewsBot(commands.Bot):
         print("📦 Configs carregadas:", self.configs)
 
     # LOOP ∞
+
     @tasks.loop(seconds=CHECK_INTERVAL)
     async def check_news(self):
         for guild_id, config in list(self.configs.items()):
@@ -76,7 +79,7 @@ class NewsBot(commands.Bot):
             try:
                 channel = await self.fetch_channel(channel_id)
             except discord.NotFound:
-                print(f"❌ Canal {channel_id} não existe. Removendo da config.")
+                print(f"❌ Canal {channel_id} não existe. Removendo config.")
                 del self.configs[guild_id]
                 save_configs(self.configs)
                 continue
@@ -102,13 +105,24 @@ class NewsBot(commands.Bot):
 
                 for item in reversed(news_items):
                     if item["id"] not in self.sent_news:
-                        await self.post_news(channel, item)
+                        await self.post_news(channel, item, guild_id)
                         self.sent_news.append(item["id"])
                         save_sent_news(self.sent_news)
                         await asyncio.sleep(5)
 
     # SEND NEWS
-    async def post_news(self, channel, item):
+
+    async def post_news(self, channel, item, guild_id):
+        config = self.configs.get(str(guild_id), {})
+        roles_cfg = config.get("roles", {})
+
+        role_ids = roles_cfg.get(item["category"], [])
+
+        if isinstance(role_ids, int):
+            role_ids = [role_ids]
+
+        role_mentions = " ".join(f"<@&{rid}>" for rid in role_ids)
+
         color = discord.Color.blue() if item["category"] == "windows" else discord.Color.orange()
 
         embed = discord.Embed(
@@ -123,13 +137,17 @@ class NewsBot(commands.Bot):
 
         embed.set_footer(text=f"Fonte: {item['category'].capitalize()} | {item['published']}")
 
-        await channel.send(embed=embed)
+        await channel.send(
+            content=f"🔔 **Breaking News!** {role_mentions}",
+            embed=embed,
+            allowed_mentions=discord.AllowedMentions(roles=True)
+        )
 
 
 bot = NewsBot()
 
+# COMMANDS#
 
-# COMMANDS
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setchannel(ctx):
@@ -143,9 +161,7 @@ async def setchannel(ctx):
     bot.configs[guild_id]["linux"] = True
 
     save_configs(bot.configs)
-
     await ctx.send(f"✅ Canal configurado para notícias: {ctx.channel.mention}")
-
 
 @bot.command()
 async def showconfig(ctx):
@@ -166,8 +182,114 @@ async def showconfig(ctx):
         f"Linux: {config.get('linux')}"
     )
 
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def setrole(ctx, os_name: str, role: discord.Role):
+    os_name = os_name.lower()
 
-# TEST COMMAND
+    if os_name not in ["windows", "linux"]:
+        await ctx.send("Use: `!setrole windows @Role` ou `!setrole linux @Role`")
+        return
+
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in bot.configs:
+        bot.configs[guild_id] = {}
+
+    if "roles" not in bot.configs[guild_id]:
+        bot.configs[guild_id]["roles"] = {}
+
+    if os_name not in bot.configs[guild_id]["roles"]:
+        bot.configs[guild_id]["roles"][os_name] = []
+
+    if role.id in bot.configs[guild_id]["roles"][os_name]:
+        await ctx.send(f"⚠️ {role.mention} já configurado para {os_name}.")
+        return
+
+    bot.configs[guild_id]["roles"][os_name].append(role.id)
+    save_configs(bot.configs)
+
+    await ctx.send(f"✅ Cargo adicionado para **{os_name}**: {role.mention}")
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def removerole(ctx, os_name: str, role: discord.Role):
+    os_name = os_name.lower()
+
+    if os_name not in ["windows", "linux"]:
+        await ctx.send("Use: `!removerole windows @Role` ou `!removerole linux @Role`")
+        return
+
+    guild_id = str(ctx.guild.id)
+    config = bot.configs.get(guild_id, {})
+    roles = config.get("roles", {})
+
+    if os_name not in roles:
+        await ctx.send(f"⚠️ Nenhum cargo configurado para {os_name}.")
+        return
+
+    if role.id not in roles[os_name]:
+        await ctx.send(f"⚠️ {role.mention} não está configurado para {os_name}.")
+        return
+
+    roles[os_name].remove(role.id)
+    save_configs(bot.configs)
+
+    await ctx.send(f"🗑️ Cargo removido de **{os_name}**: {role.mention}")
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def clearroles(ctx, os_name: str):
+    os_name = os_name.lower()
+
+    if os_name not in ["windows", "linux"]:
+        await ctx.send("Use: `!clearroles windows` ou `!clearroles linux`")
+        return
+
+    guild_id = str(ctx.guild.id)
+
+    if guild_id not in bot.configs:
+        await ctx.send("Servidor não configurado.")
+        return
+
+    if "roles" not in bot.configs[guild_id]:
+        await ctx.send("Nenhum cargo configurado ainda.")
+        return
+
+    bot.configs[guild_id]["roles"][os_name] = []
+    save_configs(bot.configs)
+
+    await ctx.send(f"🧹 Todos os cargos de **{os_name}** foram removidos.")
+
+
+@bot.command()
+async def showroles(ctx):
+    config = bot.configs.get(str(ctx.guild.id), {})
+    roles = config.get("roles", {})
+
+    if not roles:
+        await ctx.send("⚠️ Nenhum cargo configurado ainda.")
+        return
+
+    msg = "📌 **Cargos configurados:**\n"
+
+    for os_name, role_ids in roles.items():
+        if isinstance(role_ids, int):
+            role_ids = [role_ids]
+
+        role_mentions = []
+        for rid in role_ids:
+            role = ctx.guild.get_role(rid)
+            if role:
+                role_mentions.append(role.mention)
+
+        msg += f"{os_name}: {' '.join(role_mentions)}\n"
+
+    await ctx.send(msg)
+
+
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def testnews(ctx):
@@ -187,12 +309,20 @@ async def testnews(ctx):
     for category in ["windows", "linux"]:
         news = bot.fetcher.fetch_latest_news(category, limit=1)
         if news:
-            await bot.post_news(channel, news[0])
+            await bot.post_news(channel, news[0], str(ctx.guild.id))
         else:
             await ctx.send(f"Nenhuma notícia encontrada para {category}")
 
 
+@bot.command()
+@commands.has_permissions(manage_messages=True)
+async def say(ctx, *, message: str):
+    await ctx.message.delete()
+    await ctx.send(message)
+
+
 # HELLO WORLD?
+
 if __name__ == "__main__":
     if not TOKEN:
         print("❌ DISCORD_TOKEN não configurado.")
