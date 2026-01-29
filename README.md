@@ -123,7 +123,9 @@ python3 bot.py
 ## Commands
 
 ### Set the news channel
-- Run this command in the desired channel: !setchannel
+- Run this command in the desired channel:
+ !setchannel
+ !testnews
 
 ---
 
