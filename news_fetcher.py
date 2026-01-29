@@ -4,7 +4,7 @@ from typing import List, Dict
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 
-# Os links abaixos podem ser editados de acordo com o proposito
+# Os link abaixo, podem ser alterados conforme o proposito
 class NewsFetcher:
     def __init__(self):
         self.sources = {
@@ -17,19 +17,10 @@ class NewsFetcher:
             ]
         }
 
-    # ---------------- UTILIDADES ---------------- #
-
+    # UTIL
     def clean_html(self, text: str) -> str:
         clean = re.compile("<.*?>")
         return re.sub(clean, "", text).strip()
-
-    def detect_language(self, title: str) -> str:
-        # Heurística simples
-        pt_keywords = ["windows", "linux", "atualização", "lança", "novo", "versão", "kernel"]
-        for word in pt_keywords:
-            if word in title.lower():
-                return "🇧🇷"
-        return "🇺🇸"
 
     def parse_date(self, entry) -> datetime:
         try:
@@ -50,8 +41,7 @@ class NewsFetcher:
 
         return True
 
-    # ---------------- MAIN ---------------- #
-
+    # MAIN
     def fetch_latest_news(self, category: str, limit: int = 3) -> List[Dict]:
         if category not in self.sources:
             return []
@@ -99,14 +89,11 @@ class NewsFetcher:
                                 image_url = img_match.group(1)
 
                         summary = self.clean_html(entry.summary if "summary" in entry else "")
-
                         published_date = self.parse_date(entry)
-
-                        lang_emoji = self.detect_language(title)
 
                         news_items.append({
                             "id": news_id,
-                            "title": f"{lang_emoji} {title}",
+                            "title": title,
                             "link": link,
                             "summary": summary[:300] + "...",
                             "image_url": image_url,
@@ -123,18 +110,14 @@ class NewsFetcher:
                 print(f"[ERROR] Erro ao acessar feed {source}: {feed_error}")
                 continue
 
-        # Ordenar por data (mais recente primeiro)
         news_items.sort(key=lambda x: x["date_obj"], reverse=True)
-
-        # Limitar quantidade final
         return news_items[:limit]
 
 
-# ---------------- TESTE LOCAL ---------------- #
-
+# TEST LOCAL
 if __name__ == "__main__":
     fetcher = NewsFetcher()
-    print("Testando versão PREMIUM...\n")
+    print("Testando...\n")
 
     for cat in ["windows", "linux"]:
         news = fetcher.fetch_latest_news(cat, limit=3)
