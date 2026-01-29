@@ -44,7 +44,7 @@ def save_configs(configs):
         json.dump(configs, f, indent=4)
 
 
-# MAIN 
+# WINUX-CHAN
 class NewsBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -64,7 +64,7 @@ class NewsBot(commands.Bot):
         print(f"✅ Bot conectado como {self.user}")
         print("📦 Configs carregadas:", self.configs)
 
-    # TASK LOOP
+    # LOOP ∞
     @tasks.loop(seconds=CHECK_INTERVAL)
     async def check_news(self):
         for guild_id, config in list(self.configs.items()):
@@ -73,7 +73,6 @@ class NewsBot(commands.Bot):
             if not channel_id:
                 continue
 
-            # SEARCH CHANNEL
             try:
                 channel = await self.fetch_channel(channel_id)
             except discord.NotFound:
@@ -166,6 +165,31 @@ async def showconfig(ctx):
         f"Windows: {config.get('windows')}\n"
         f"Linux: {config.get('linux')}"
     )
+
+
+# TEST COMMAND
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def testnews(ctx):
+    await ctx.send("🔎 Testando envio de notícias...")
+
+    config = bot.configs.get(str(ctx.guild.id))
+    if not config:
+        await ctx.send("Servidor não configurado. Use !setchannel")
+        return
+
+    try:
+        channel = await bot.fetch_channel(config["channel_id"])
+    except Exception:
+        await ctx.send("Erro ao acessar o canal configurado.")
+        return
+
+    for category in ["windows", "linux"]:
+        news = bot.fetcher.fetch_latest_news(category, limit=1)
+        if news:
+            await bot.post_news(channel, news[0])
+        else:
+            await ctx.send(f"Nenhuma notícia encontrada para {category}")
 
 
 # HELLO WORLD?
