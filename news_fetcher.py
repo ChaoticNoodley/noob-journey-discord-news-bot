@@ -30,17 +30,6 @@ class NewsFetcher:
             pass
         return datetime.utcnow()
 
-    def is_valid_news(self, title: str, category: str) -> bool:
-        title_lower = title.lower()
-
-        if category == "windows":
-            return "windows" in title_lower or "microsoft" in title_lower
-
-        if category == "linux":
-            return any(word in title_lower for word in ["linux", "ubuntu", "debian", "kernel", "fedora"])
-
-        return True
-
     # MAIN
     def fetch_latest_news(self, category: str, limit: int = 3) -> List[Dict]:
         if category not in self.sources:
@@ -64,9 +53,6 @@ class NewsFetcher:
                         news_id = entry.id if hasattr(entry, "id") else link
 
                         if news_id in seen_ids:
-                            continue
-
-                        if not self.is_valid_news(title, category):
                             continue
 
                         seen_ids.add(news_id)
