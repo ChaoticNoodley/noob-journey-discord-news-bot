@@ -1,158 +1,164 @@
 # Winux-chan: Discord News Bot
 
-**A Curious Beginner’s Journey Building a Discord News Bot**
+![GitHub repo size](https://img.shields.io/github/repo-size/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
+![GitHub issues](https://img.shields.io/github/issues/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
 
-Winux-chan is a Discord bot written in Python that automatically posts news about Windows and Linux using RSS feeds from reliable tech websites.
+<img src="https://imgur.com/undefined.png" alt="Winux-chan Bot">
 
-The bot is now configurable per server via commands, so no code editing is required to set it up.
----
+> **PT-BR:**  
+> Winux-chan é um bot de Discord escrito em Python que publica automaticamente notícias sobre Windows e Linux usando feeds RSS de sites confiáveis de tecnologia.  
+> O bot é configurável por servidor e não exige edição de código para funcionar.
 
-## Features
-
-- Automatic news about Windows and Linux
-- Server-based configuration (multi-server support)
-- Configurable news channel via command
-- Fixed check interval (e.g., every 1 hour)
-- Multiple RSS sources
-- Fault-tolerant (does not crash if a feed is offline)
-- Saves already sent news to avoid reposting
+> **EN:**  
+> Winux-chan is a Discord bot written in Python that automatically posts Windows and Linux news using RSS feeds from reliable tech websites.  
+> The bot is configurable per server and requires no code editing to run.
 
 ---
 
-## Technologies
+## ⚙️ Ajustes e melhorias | Improvements
 
-- Python 3
-- [discord.py](https://github.com/Rapptz/discord.py)
-- [feedparser](https://github.com/kurtmckee/feedparser) (for handling RSS feeds)
-- JSON file for tracking sent news
-- [python-dotenv](https://pypi.org/project/python-dotenv/)
+O projeto ainda está em desenvolvimento e as próximas atualizações incluem:  
+The project is still under development and upcoming updates include:
 
----
-
-## Project Structure
-
-noticias_bot/
-│
-├── bot.py/
-├── news_fetcher.py/
-├── server_config.json/
-├── sent_news.json/
-├── .env/
-└── venv/
+- [x] Sistema automático de RSS | Automatic RSS system  
+- [x] Suporte a múltiplos servidores | Multi-server support  
+- [x] Canal configurável por comando | Configurable channel via command  
+- [x] Evita repostar notícias | Prevents duplicate news  
+- [ ] Mais fontes de notícias | More news sources  
+- [ ] Sistema de categorias (Windows / Linux) | Category system (Windows / Linux)  
+- [ ] Melhor sistema de configuração | Improved configuration system  
 
 ---
 
-## Setup
+## 💻 Pré-requisitos | Requirements
 
-### Windows
+Antes de começar, você precisa:  
+Before you begin, make sure you have:
 
-1. Install Python 3.10+ from:
-https://www.python.org/downloads/windows/
+- Python **3.10+**
+- Sistema operacional | Operating System:
+  - ✅ Windows  
+  - ✅ Linux  
+  - ✅ macOS
+- Conhecimento básico de:
+  - Discord bots
+  - Terminal / Command line
 
-(Check **"Add Python to PATH"** during installation)
+---
 
-2. Clone the repository:
+## 🚀 Instalando Winux-chan | Installing Winux-chan
+
+### Linux e macOS
+
 ```bash
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
-```
-3. Create and activate a virtual environment:
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-4. Install dependencies:
-```bash
+git clone https://github.com/ChaoticNoodley/noob-journey-discord-news-bot.git
+cd noob-journey-discord-news-bot
+
+python3 -m venv venv
+source venv/bin/activate
+
 pip install -r requirements.txt
 ```
-5. Create the .env file:
-```bash
-DISCORD_TOKEN:
-ROLE_LINUX_ID:
-ROLE_WINDOWS_ID:
-OPENAI_API_KEY= *Fill it in if you want, just remember to update the code*
+
+Crie o arquivo .env:
+Create the .env file:
+```env
+DISCORD_TOKEN=
+ROLE_LINUX_ID=
+ROLE_WINDOWS_ID=
+OPENAI_API_KEY=
 CHECK_INTERVAL=3600
 ```
-6. Create the configuration file:
+
+Crie o arquivo de configuração:
+Create the config file:
+```bash
+echo "{}" > server_config.json
+```
+
+Execute o bot:
+Run the bot:
+```bash
+python3 bot.py
+```
+
+### Windows
+```bash
+git clone https://github.com/ChaoticNoodley/noob-journey-discord-news-bot.git
+cd noob-journey-discord-news-bot
+
+python -m venv venv
+venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+Crie o arquivo .env:
+Create the .env file:
+```bash
+DISCORD_TOKEN=
+ROLE_LINUX_ID=
+ROLE_WINDOWS_ID=
+OPENAI_API_KEY=
+CHECK_INTERVAL=3600
+```
+
+Crie o arquivo de configuração:
+Create the config file:
 ```bash
 echo {} > server_config.json
 ```
-7. Run the bot:
+
+Execute o bot:
+Run the bot:
 ```bash
 python bot.py
 ```
 
-### Linux/MacOS
+## ☕ Usando Winux-chan | Using Winux-chan
 
-1. Install Python 3.10+:
+Após iniciar o bot no seu servidor Discord, utilize os comandos:
+After starting the bot on your Discord server, use the commands:
+
 ```bash
-sudo apt install python3 python3-venv python3-pip   # Ubuntu/Debian
-brew install python                                 # macOS (Homebrew)
+!setchannel
+!testnews
 ```
-2. Clone the repository
-```bash
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
+Exemplo | Example:
+- Vá até o canal desejado | Go to the desired channel
+- Execute !setchannel
+- O bot enviará notícias automaticamente | The bot will start posting news automatically
+
+## 📂 Estrutura do projeto | Project Structure
+```sql
+noticias_bot/
+│
+├── bot.py
+├── news_fetcher.py
+├── server_config.json
+├── sent_news.json
+├── .env
+└── venv
 ```
-3. Create and activate a virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-4. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-5. Create the .env file:
-```bash
-DISCORD_TOKEN:
-ROLE_LINUX_ID:
-ROLE_WINDOWS_ID:
-OPENAI_API_KEY= *Fill it in if you want, just remember to update the code*
-CHECK_INTERVAL=3600
-```
-6. Create the configuration file:
-```bash
-echo "{}" > server_config.json
-```
-7. Run the BOT
-```bash
-python3 bot.py
-```
----
-## Commands
+##🤝 Colaborador | Contributor
+<table> <tr> <td align="center"> <a href="https://github.com/ChaoticNoodley"> <img src="https://github.com/ChaoticNoodley.png" width="100px;" alt="Foto do autor"/><br> <sub> <b>Bruno Ceroni</b> </sub> </a> </td> </tr> </table>
 
-### Set the news channel
-- Run this command in the desired channel:
- !setchannel
- !testnews
+## 📝 Licença | License
+Este projeto é open source e livre para qualquer pessoa usar, modificar e distribuir para fins educacionais e pessoais.
+This project is open source and free for anyone to use, modify, and distribute for educational and personal purposes.
 
----
+Veja o arquivo:
+See the file:
+LICENSE
 
-## Notes
-- This project is for learning and personal use.
+##🎯 Motivação | Motivation
 
-- Customization: You can change the news sources by editing the RSS URL list in the code.
-
-- Contributions and suggestions are welcome.
-
-- Do not forget to keep your Discord token private.
-  
----
-
-## Motivation
-This bot was created as a personal challenge to learn more about:
-
+Este projeto foi criado como um desafio pessoal para aprender mais sobre:
+This project was created as a personal challenge to learn more about:
 - Python
-
-- RSS Feeds & Data Parsing
-
-- Discord bots
-
-- Automation
-
----
-
-## 📜 License
-
-Free to use for learning and personal projects.
+- RSS Feeds
+- Discord Bots
+- Automação | Automation
+- Manipulação de dados | Data handling
