@@ -5,7 +5,7 @@
 ![GitHub forks](https://img.shields.io/github/forks/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
 ![GitHub issues](https://img.shields.io/github/issues/ChaoticNoodley/noob-journey-discord-news-bot?style=for-the-badge)
 
-<img src="https://imgur.com/undefined.png" alt="Winux-chan Bot">
+<img src="https://imgur.com/eQq2K8i.png" alt="Winux-chan Bot">
 
 > **PT-BR:**  
 > Winux-chan é um bot de Discord escrito em Python que publica automaticamente notícias sobre Windows e Linux usando feeds RSS de sites confiáveis de tecnologia.  
