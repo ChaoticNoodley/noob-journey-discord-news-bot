@@ -4,6 +4,23 @@ from typing import List, Dict
 from datetime import datetime
 from email.utils import parsedate_to_datetime
 
+def parse_date(self, entry) -> datetime:
+    try:
+        if hasattr(entry, "published"):
+            dt = parsedate_to_datetime(entry.published)
+
+            # se vier sem timezone, assume UTC
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=datetime.timezone.utc)
+
+            # converte para horário local do sistema
+            return dt.astimezone()
+
+    except Exception:
+        pass
+
+    return datetime.now().astimezone()
+
 # Os links abaixo podem ser alterados conforme o propósito
 class NewsFetcher:
     def __init__(self):
@@ -13,7 +30,8 @@ class NewsFetcher:
             ],
             "linux": [
                 "https://diolinux.com.br/feed",
-                "https://9to5linux.com/feed/"
+                "https://9to5linux.com/feed/",
+                "https://itsfoss.com/rss/"
             ]
         }
 
