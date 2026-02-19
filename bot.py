@@ -44,7 +44,7 @@ class NewsBot(commands.Bot):
         intents.guilds = True
 
         super().__init__(
-            command_prefix=None,
+            command_prefix="/",
             intents=intents,
             help_command=None
         )
