@@ -26,7 +26,8 @@ class NewsFetcher:
     def __init__(self):
         self.sources = {
             "windows": [
-                "https://www.windowslatest.com/feed/"
+                "https://www.windowslatest.com/feed/",
+                "https://windowsclub.com.br/feed/"
             ],
             "linux": [
                 "https://diolinux.com.br/feed",
