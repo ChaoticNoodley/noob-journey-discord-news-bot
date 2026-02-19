@@ -1,6 +1,15 @@
-.env
-venv/
+# Python
 __pycache__/
+*.pyc
+
+# Cache
 .cache/
 .local/
-*.json
+
+# Virtual environment
+venv/
+
+# Configs sensíveis
+.env
+server_config.json
+sent_news.json
